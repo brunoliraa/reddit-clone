@@ -1,6 +1,7 @@
 package com.redditclone.service;
 
 import com.redditclone.dto.RegisterRequest;
+import com.redditclone.exception.SpringRedditException;
 import com.redditclone.model.NotificationEmail;
 import com.redditclone.model.User;
 import com.redditclone.model.VerificationToken;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,6 +28,7 @@ public class AuthService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
 
+    //cadastro de user
     @Transactional
     public void signup(RegisterRequest registerRequest) {
         User user = new User();
@@ -43,6 +46,7 @@ public class AuthService {
         + "http://localhost:8080/api/auth/accountVerification/"+token));
     }
 
+    //cria um token para verificação de conta
     private String generateVerificationToken(User user){
         String token = UUID.randomUUID().toString();
         VerificationToken verificationToken = new VerificationToken();
@@ -50,5 +54,19 @@ public class AuthService {
         verificationToken.setUser(user);
         verificationTokenRepository.save(verificationToken);
         return token;
+    }
+
+    //busca e ativa o user
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User not found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    //verifica se o token é válido pra cadastrar o user
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        fetchUserAndEnable(verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token")));
     }
 }
