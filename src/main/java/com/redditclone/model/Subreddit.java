@@ -29,6 +29,7 @@ public class Subreddit {
     @OneToMany(fetch = LAZY)
     private List<Post> posts;
     private Instant createdDate;
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id")
     private User user;
 }
