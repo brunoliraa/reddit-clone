@@ -29,6 +29,7 @@ public class JwtProvider {
 
     @PostConstruct
     public void init() {
+        //fornece uma key store instance do tipo jks
         try {
             keyStore = KeyStore.getInstance("JKS");
             InputStream resourceAsStream = getClass().getResourceAsStream("/springblog.jks");
@@ -40,6 +41,7 @@ public class JwtProvider {
     }
     //para assinar o jwt é necessário uma private key
     //encriptação assimétrica
+    //Classe User do spring
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
@@ -58,6 +60,7 @@ public class JwtProvider {
                 .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
                 .compact();
     }
+
 
     private PrivateKey getPrivateKey() {
         try {

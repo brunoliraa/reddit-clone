@@ -11,7 +11,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 public class AuthenticationResponse {
-
+    //contém as informações de resposta, quando o usuário loga no sistema
     private String authenticationToken;
     private String refreshToken;
     private Instant expiresAt;

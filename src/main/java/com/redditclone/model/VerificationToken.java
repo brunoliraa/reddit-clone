@@ -17,6 +17,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Table(name = "token")
 public class VerificationToken {
 
+    //enviado para o email para confirmar o cadastro
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

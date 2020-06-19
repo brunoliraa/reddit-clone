@@ -21,6 +21,7 @@ import java.io.IOException;
 @Component
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
+//para cada requisição verifica o Token recebido no Bearer e autoriza
 
 //    @Autowired
     private final JwtProvider jwtProvider;
@@ -33,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
-
+        //
         if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
             String username = jwtProvider.getUsernameFromJwt(jwt);
 
@@ -50,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
 
+        //pega apenas o que vem depois de "Bearer ", o token
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

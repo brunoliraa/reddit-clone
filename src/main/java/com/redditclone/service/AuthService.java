@@ -60,15 +60,15 @@ public class AuthService {
 
     //cria um token para verificação de conta
     private String generateVerificationToken(User user){
-        String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString(); //cria um único e random valor
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setToken(token);
         verificationToken.setUser(user);
-        verificationTokenRepository.save(verificationToken);
+        verificationTokenRepository.save(verificationToken); //é bom salvar o token no banco
         return token;
     }
 
-    //busca e ativa o user
+    //busca e ativa o user, e atualiza o user no banco
     private void fetchUserAndEnable(VerificationToken verificationToken) {
         String username = verificationToken.getUser().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User not found with name - " + username));
@@ -76,16 +76,17 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    //verifica se o token é válido pra cadastrar o user
+    //recebe o token, procurar no banco e verifica se o token é válido pra cadastrar o user
     public void verifyAccount(String token) {
         Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
         fetchUserAndEnable(verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token")));
     }
 
     public AuthenticationResponse login(LoginRequest loginRequest) {
+        //Authentication pega o username e a senha
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                 loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        SecurityContextHolder.getContext().setAuthentication(authenticate);//coloca o user como logado
         String token = jwtProvider.generateToken(authenticate);
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
@@ -96,6 +97,7 @@ public class AuthService {
 //        return new AuthenticationResponse(token, loginRequest.getUsername());
     }
 
+    //gera um novo token apartir do refresh token
     public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
         refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
         String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());

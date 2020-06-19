@@ -20,6 +20,7 @@ public class MailService {
     private final MailContentBuilder mailContentBuilder;
 
     @Async //para processos assincronos, diminui muito o tempo da requisição
+    //recebe o objeto com as informações do envio do email
     void sendMail(NotificationEmail notificationEmail) {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
